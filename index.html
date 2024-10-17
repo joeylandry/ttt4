@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HELLO TIC-TAC-TOE 4</title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        /* turn indicator and win condition message style */
+        .turn-ind, .win-con {
+            border: 2px solid #000000;
+            padding: 10px;
+            margin: 10px;
+            font-size: 24px;
+        }
+
+        /* grid style */
+        .ttt-grid {
+            display: grid;
+            grid-template-columns: 100px 100px 100px;
+            grid-gap: 10px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+
+        /* each square style */
+        .square {
+            background-color: #add8e6;
+            text-align: center;
+            font-size: 50px;
+            line-height: 100px;
+            width: 100px;
+            height: 100px;
+        }
+
+        .square:hover {
+            background-color: #90ee90;
+        }
+    </style>
+</head>
+<body>
+
+<h1>HELLO TIC-TAC-TOE</h1>
+
+<div class="turn-ind" id="turn-ind">X's Turn</div>
+
+<button onclick="start()">Start Game</button>
+
+<script>
+document.write('<div class="ttt-grid">');
+
+const NUM_SQUARES = 9;
+for (let i = 0; i < NUM_SQUARES; i++) {
+    let id = "sq" + i;
+    document.write("<div class='square' id='" + id + "'></div>");
+}
+
+// Closes the TTT grid div 
+document.write('</div>');
+
+document.getElementById('sq2').textContent = 'X';
+document.getElementById('sq3').textContent = 'O'; 
+
+let currPlayer;
+let active = true;
+
+//starts the game, clears the board and determines first random player 
+function start() {
+    active = true;
+    clear();
+    currPlayer = Math.random() < 0.5 ? 'X' : 'O';
+    //updates turn indicator 
+    document.getElementById('turn-ind').textContent = currPlayer + "'s Turn";
+}
+
+// click event for each square 
+for (let i = 0; i < NUM_SQUARES; i++) {
+    document.getElementById("sq" + i).addEventListener("click", function() {
+        clickSq(i);
+    });
+}
+
+//function for when each square is clicked
+function clickSq(index) {
+    if (!active) return;
+    const square = document.getElementById("sq" + index);
+
+    if (square.textContent !== "") return;
+
+    //set square to current player and disable further click
+    square.textContent = currPlayer;
+    square.classList.add('disabled');
+
+    alert("You clicked square " + index);
+
+    let moves = [];
+    //adds each square value to the move array
+    document.querySelectorAll('.square').forEach(square => moves.push(square.textContent || "-"));
+
+    //generates win condition array, checks for a winner 
+    let winConditions = createW(moves);
+    let winner = checkW(winConditions);
+
+    if (winner) {
+        document.getElementById('win-con').textContent = "Player " + winner + " Wins!";
+        active = false;
+    } else if (!moves.includes("-")) {
+        document.getElementById('win-con').textContent = "It's a stalemate!";
+        active = false;
+    } else {
+        currPlayer = currPlayer === "X" ? "O" : "X";
+        document.getElementById("turn-ind").textContent = currPlayer + "'s Turn";
+    }
+}
+
+//creates the win conditions based on state of the board
+function createW(moves) {
+    return [
+        moves[0] + moves[1] + moves[2],
+        moves[3] + moves[4] + moves[5],
+        moves[6] + moves[7] + moves[8],
+        moves[0] + moves[3] + moves[6],
+        moves[1] + moves[4] + moves[7],
+        moves[2] + moves[5] + moves[8],
+        moves[0] + moves[4] + moves[8],
+        moves[2] + moves[4] + moves[6]
+    ];
+}
+
+//checks if win conditions are met
+function checkW(winConditions) {
+    for (let cond of winConditions) {
+        if (cond === "XXX") return "X";
+        if (cond === "OOO") return "O";
+    }
+    return null;
+}
+
+//clears the board for new game and reset win message
+function clear() {
+    for (let i = 0; i < NUM_SQUARES; i++) {
+        const square = document.getElementById("sq" + i);
+        square.textContent = "";
+        square.classList.remove('disabled');
+        document.getElementById('win-con').textContent = "Player ? Wins!";
+    }
+}
+</script>
+
+<div class="win-con" id="win-con">Player ? Wins!</div>
+
+</body>
+</html>
